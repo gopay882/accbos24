@@ -562,6 +562,54 @@ form input[type=radio]:not(:checked)::before {
 
 <!-- partial -->
   <script>
+// Array untuk menyimpan alamat IP dan waktu akses terakhir
+const ipLog = [];
+
+// Fungsi untuk mencatat akses IP
+function logIP(ip) {
+  const existingEntry = ipLog.find(entry => entry.ip === ip);
+  if (existingEntry) {
+    // Jika IP sudah ada, perbarui waktu akses
+    existingEntry.lastAccess = Date.now();
+  } else {
+    // Jika IP baru, tambahkan ke array
+    ipLog.push({ ip: ip, lastAccess: Date.now() });
+  }
+}
+
+// Fungsi untuk memeriksa akses IP
+function checkIP(ip) {
+  // Hapus entri IP yang sudah lebih dari 1 menit
+  ipLog.forEach((entry, index) => {
+    if (Date.now() - entry.lastAccess > 60000) {
+      ipLog.splice(index, 1);
+    }
+  });
+
+  // Hitung jumlah akses dalam 1 menit
+  const recentAccesses = ipLog.filter(entry => Date.now() - entry.lastAccess <= 60000);
+  if (recentAccesses.length > 5) {
+    // Jika lebih dari 5 akses, blokir
+    return false;
+  }
+  return true;
+}
+
+// Contoh penggunaan
+const ip = '192.168.1.10';
+
+// Catat akses IP
+logIP(ip);
+
+// Periksa akses IP
+if (checkIP(ip)) {
+  // Izinkan akses jika tidak diblokir
+  console.log('Akses Diizinkan');
+} else {
+  // Blokir akses jika diblokir
+  console.log('Akses Diblokir');
+}
+   
 var owl = $('.owl-carousel');
 owl.owlCarousel({
     items:2, 
